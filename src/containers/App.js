@@ -1,17 +1,32 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import CardList from "../components/CardList";
 import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll";
 import ErrorBoundry from "../components/ErrorBoundry";
 import "./App.css";
+import { setSearchField } from "../actions";
+
+//CONNECT WITH REDUCERS
+const mapStateToProps = state => {
+  return {
+    searchField: state.searchField
+  };
+};
+
+//CONNECT WITH ACTIONS
+const mapDispatchToProps = dispatch => {
+  return {
+    onSearchChange: e => dispatch(setSearchField(e.target.value))
+  };
+};
 
 class App extends Component {
   constructor() {
     super();
     //MAKE STATE robots VALUE IS ARRAY OF ROBOT , searchInput is value of searchBox
     this.state = {
-      robots: [],
-      searchInput: ""
+      robots: []
     };
   }
 
@@ -21,20 +36,14 @@ class App extends Component {
       .then(users => this.setState({ robots: users }));
   }
 
-  //function for get value from searchBox and change state searchInput
-  onSearchChange = e => {
-    this.setState({ searchInput: e.target.value });
-  };
-
   render() {
-    const { robots, searchInput } = this.state;
-    const { onSearchChange } = this;
-
+    const { robots } = this.state;
+    const { searchField, onSearchChange } = this.props;
     //USE FILTERING ARRAY TO COMPARE STATE robot with STATE searchInput
     const robotFilter = robots.filter(robot => {
       return robot.name
         .toLocaleLowerCase()
-        .includes(searchInput.toLocaleLowerCase());
+        .includes(searchField.toLocaleLowerCase());
     });
 
     return !robots.length ? (
@@ -61,4 +70,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
