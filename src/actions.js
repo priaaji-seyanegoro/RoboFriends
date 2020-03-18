@@ -1,4 +1,9 @@
-import { CHANGE_SEARCH_FIELD } from "./constants";
+import {
+  CHANGE_SEARCH_FIELD,
+  REQUEST_ROBOTS_PENDING,
+  REQUEST_ROBOTS_SUCCESS,
+  REQUEST_ROBOTS_FAILED
+} from "./constants";
 
 export const setSearchField = text => ({
   //action been takin call change_search_field
@@ -6,3 +11,11 @@ export const setSearchField = text => ({
   // payload sending all data needed to reduce or whatever data enter
   payload: text
 });
+
+export const requestRobots = () => dispatch => {
+  dispatch({ type: REQUEST_ROBOTS_PENDING });
+  fetch("https://jsonplaceholder.typicode.com/users")
+    .then(res => res.json())
+    .then(data => dispatch({ type: REQUEST_ROBOTS_SUCCESS, payload: data }))
+    .catch(error => dispatch({ type: REQUEST_ROBOTS_FAILED, payload: error }));
+};

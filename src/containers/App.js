@@ -5,40 +5,33 @@ import SearchBox from "../components/SearchBox";
 import Scroll from "../components/Scroll";
 import ErrorBoundry from "../components/ErrorBoundry";
 import "./App.css";
-import { setSearchField } from "../actions";
+import { setSearchField, requestRobots } from "../actions";
 
-//CONNECT WITH REDUCERS
+//Everytime state change this func trigged
 const mapStateToProps = state => {
   return {
-    searchField: state.searchField
+    searchField: state.searchRobots.searchField,
+    robots: state.requestRobots.robots,
+    isPending: state.requestRobots.isPending,
+    error: state.requestRobots.error
   };
 };
 
-//CONNECT WITH ACTIONS
+//Everytime action trigged this func run
 const mapDispatchToProps = dispatch => {
   return {
-    onSearchChange: e => dispatch(setSearchField(e.target.value))
+    onSearchChange: e => dispatch(setSearchField(e.target.value)),
+    onRequestRobots: () => dispatch(requestRobots())
   };
 };
 
 class App extends Component {
-  constructor() {
-    super();
-    //MAKE STATE robots VALUE IS ARRAY OF ROBOT , searchInput is value of searchBox
-    this.state = {
-      robots: []
-    };
-  }
-
   componentDidMount() {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then(res => res.json())
-      .then(users => this.setState({ robots: users }));
+    this.props.onRequestRobots();
   }
 
   render() {
-    const { robots } = this.state;
-    const { searchField, onSearchChange } = this.props;
+    const { searchField, onSearchChange, robots, isPending } = this.props;
     //USE FILTERING ARRAY TO COMPARE STATE robot with STATE searchInput
     const robotFilter = robots.filter(robot => {
       return robot.name
@@ -46,7 +39,7 @@ class App extends Component {
         .includes(searchField.toLocaleLowerCase());
     });
 
-    return !robots.length ? (
+    return isPending ? (
       // if state robot dont have data
       <div className="tc">
         <h1 className="f1">ROBOFRIENDS</h1>
